@@ -79,17 +79,23 @@ export default function ChatsScreen() {
   });
 
   const handleAddFriend = () => {
-    Alert.alert(
+    Alert.prompt(
       'Add Friend',
       'Enter the anonymous ID of the user you want to connect with:',
       [
         { text: 'Cancel', style: 'cancel' },
         { 
           text: 'Send Request', 
-          onPress: () => Alert.alert('Success', 'Friend request sent! 📤')
+          onPress: (text) => {
+            if (text && text.trim()) {
+              Alert.alert('Success', `Friend request sent to ${text}! 📤`);
+            } else {
+              Alert.alert('Error', 'Please enter a valid anonymous ID');
+            }
+          }
         }
       ],
-      { type: 'plain-text' }
+      'plain-text'
     );
   };
 

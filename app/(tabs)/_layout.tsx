@@ -48,15 +48,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="news"
-        options={{
-          title: 'News',
-          tabBarIcon: ({ size, color }) => (
-            <Newspaper size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',

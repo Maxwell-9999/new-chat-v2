@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Send, Paperclip, Mic, Phone, Video, MoveVertical as MoreVertical, UserX, Star, Info } from 'lucide-react-native';
+import { ArrowLeft, Send, Paperclip, Mic, MoveVertical as MoreVertical, UserX, Star, Info, VolumeX, Ban } from 'lucide-react-native';
 
 interface Message {
   id: string;
@@ -113,8 +114,9 @@ export default function ChatScreen() {
       [
         { text: 'View Profile', onPress: () => Alert.alert('Profile', `Username: ${chatName}\nStatus: ${isOnline ? 'Online' : 'Last seen recently'}\nJoined: Dec 2024`) },
         { text: isFavorite ? 'Remove from Favorites' : 'Add to Favorites', onPress: () => setIsFavorite(!isFavorite) },
-        { text: 'Block User', style: 'destructive', onPress: () => Alert.alert('Blocked', 'User has been blocked') },
-        { text: 'Report User', style: 'destructive', onPress: () => Alert.alert('Reported', 'User has been reported') },
+        { text: 'Mute User', onPress: () => Alert.alert('Muted', `${chatName} has been muted`) },
+        { text: 'Block User', style: 'destructive', onPress: () => Alert.alert('Blocked', `${chatName} has been blocked`) },
+        { text: 'Report User', style: 'destructive', onPress: () => Alert.alert('Reported', `${chatName} has been reported`) },
         { text: 'Cancel', style: 'cancel' }
       ]
     );
@@ -176,13 +178,7 @@ export default function ChatScreen() {
         </View>
         
         <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.actionButton}>
-            <Video size={22} color="white" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
-            <Phone size={22} color="white" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity style={styles.actionButton} onPress={handleMoreOptions}>
             <MoreVertical size={22} color="white" />
           </TouchableOpacity>
         </View>

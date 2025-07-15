@@ -16,6 +16,7 @@ export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
   const [readReceipts, setReadReceipts] = useState(true);
   const [showOnlineStatus, setShowOnlineStatus] = useState(true);
+  const [allowMedia, setAllowMedia] = useState(true);
 
   const handleGenerateNewIdentity = () => {
     Alert.alert(
@@ -50,7 +51,7 @@ export default function SettingsScreen() {
     showSwitch = false, 
     switchValue, 
     onSwitchChange,
-    textColor = '#333',
+    textColor = '#ecf0f1',
     iconColor = '#6366F1'
   }: {
     icon: any;
@@ -85,7 +86,7 @@ export default function SettingsScreen() {
           thumbColor="white"
         />
       ) : (
-        <ChevronRight size={20} color="#ccc" />
+        <ChevronRight size={20} color="#7f8c8d" />
       )}
     </TouchableOpacity>
   );
@@ -107,7 +108,7 @@ export default function SettingsScreen() {
           <Text style={styles.profileStatus}>🔒 Anonymous Social Platform</Text>
         </View>
         <TouchableOpacity style={styles.profileButton} onPress={handleViewProfile}>
-          <Eye size={20} color="#6366F1" />
+          <Eye size={20} color="#2c3e50" />
         </TouchableOpacity>
       </View>
 
@@ -146,6 +147,14 @@ export default function SettingsScreen() {
           title="Favorites"
           subtitle="Manage your favorite rooms and chats"
           onPress={() => {}}
+        />
+        <SettingsItem
+          icon={Shield}
+          title="Allow Media from Friends"
+          subtitle="Receive images and files from friends"
+          showSwitch
+          switchValue={allowMedia}
+          onSwitchChange={setAllowMedia}
         />
       </View>
 
@@ -216,7 +225,7 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#2c3e50',
   },
   header: {
     backgroundColor: '#6366F1',
@@ -230,7 +239,7 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   profileSection: {
-    backgroundColor: 'white',
+    backgroundColor: '#34495e',
     flexDirection: 'row',
     alignItems: 'center',
     padding: 20,
@@ -256,18 +265,18 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: '#ecf0f1',
     marginBottom: 4,
   },
   profileStatus: {
     fontSize: 14,
-    color: '#666',
+    color: '#bdc3c7',
   },
   profileButton: {
     padding: 8,
   },
   section: {
-    backgroundColor: 'white',
+    backgroundColor: '#34495e',
     marginBottom: 16,
     paddingVertical: 8,
   },
@@ -287,7 +296,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: '#2c3e50',
   },
   settingsItemLeft: {
     flexDirection: 'row',
@@ -298,7 +307,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#EEF2FF',
+    backgroundColor: '#2c3e50',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -309,12 +318,12 @@ const styles = StyleSheet.create({
   settingsTitle: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
+    color: '#ecf0f1',
     marginBottom: 2,
   },
   settingsSubtitle: {
     fontSize: 13,
-    color: '#666',
+    color: '#bdc3c7',
   },
   footer: {
     alignItems: 'center',
@@ -324,7 +333,7 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#666',
+    color: '#bdc3c7',
     marginBottom: 4,
   },
   footerSubtext: {

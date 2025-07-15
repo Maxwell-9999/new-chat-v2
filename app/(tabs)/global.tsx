@@ -9,9 +9,13 @@ import {
   TextInput,
   Modal,
   ScrollView,
+  Alert,
+  Dimensions,
 } from 'react-native';
 import { router } from 'expo-router';
-import { Plus, Search, Heart, MessageCircle, Share, Filter, Send, ThumbsDown, Flag, TrendingUp, CircleHelp as HelpCircle } from 'lucide-react-native';
+import { Plus, Search, Heart, MessageCircle, Share, Filter, Send, ThumbsDown, Flag, TrendingUp, CircleHelp as HelpCircle, UserPlus, Ban, VolumeX, Eye, EyeOff } from 'lucide-react-native';
+
+const { width } = Dimensions.get('window');
 
 interface Confession {
   id: string;
@@ -26,6 +30,8 @@ interface Confession {
   isLiked: boolean;
   isDisliked: boolean;
   anonymousId: string;
+  likedUsers: string[];
+  dislikedUsers: string[];
 }
 
 interface Category {
@@ -39,11 +45,15 @@ interface Category {
 export default function GlobalChatScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedSection, setSelectedSection] = useState('recent'); // recent, trending, questions
+  const [selectedSection, setSelectedSection] = useState('recent');
   const [showNewPost, setShowNewPost] = useState(false);
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostContent, setNewPostContent] = useState('');
   const [newPostCategory, setNewPostCategory] = useState('general');
+  const [showUserActions, setShowUserActions] = useState<string | null>(null);
+  const [blockedUsers, setBlockedUsers] = useState<string[]>([]);
+  const [mutedUsers, setMutedUsers] = useState<string[]>([]);
+  const [hiddenPosts, setHiddenPosts] = useState<string[]>([]);
 
   const categories: Category[] = [
     { id: 'all', name: 'All', icon: '🌍', color: '#6366F1', count: 234 },
@@ -70,6 +80,8 @@ export default function GlobalChatScreen() {
       isLiked: false,
       isDisliked: false,
       anonymousId: 'Anonymous_Phoenix',
+      likedUsers: [],
+      dislikedUsers: [],
     },
     {
       id: '2',
@@ -84,6 +96,8 @@ export default function GlobalChatScreen() {
       isLiked: true,
       isDisliked: false,
       anonymousId: 'Ghost_Rider',
+      likedUsers: ['You'],
+      dislikedUsers: [],
     },
     {
       id: '3',
@@ -98,6 +112,8 @@ export default function GlobalChatScreen() {
       isLiked: false,
       isDisliked: false,
       anonymousId: 'Shadow_Cat',
+      likedUsers: [],
+      dislikedUsers: [],
     },
     {
       id: '4',
@@ -112,6 +128,8 @@ export default function GlobalChatScreen() {
       isLiked: true,
       isDisliked: false,
       anonymousId: 'Digital_Nomad',
+      likedUsers: ['You'],
+      dislikedUsers: [],
     },
     {
       id: '5',
@@ -126,10 +144,16 @@ export default function GlobalChatScreen() {
       isLiked: false,
       isDisliked: false,
       anonymousId: 'Shy_Soul',
+      likedUsers: [],
+      dislikedUsers: [],
     },
   ]);
 
   const filteredConfessions = confessions.filter(confession => {
+    if (blockedUsers.includes(confession.anonymousId) || hiddenPosts.includes(confession.id)) {
+      return false;
+    }
+    
     const matchesSearch = confession.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          confession.content.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || confession.category === selectedCategory;
@@ -145,43 +169,127 @@ export default function GlobalChatScreen() {
   });
 
   const handleLike = (id: string) => {
-    setConfessions(prev => prev.map(confession => 
-      confession.id === id 
-        ? { 
-            ...confession, 
-            isLiked: !confession.isLiked,
-            isDisliked: confession.isLiked ? confession.isDisliked : false,
-            likes: confession.isLiked ? confession.likes - 1 : confession.likes + 1
-          }
-        : confession
-    ));
+    setConfessions(prev => prev.map(confession => {
+      if (confession.id === id) {
+        const currentUserId = 'You';
+        let newLikedUsers = [...confession.likedUsers];
+        let newDislikedUsers = [...confession.dislikedUsers];
+        let newLikes = confession.likes;
+        let newDislikes = confession.dislikes;
+        
+        // Remove from disliked if currently disliked
+        if (confession.isDisliked) {
+          newDislikedUsers = newDislikedUsers.filter(user => user !== currentUserId);
+          newDislikes = Math.max(0, newDislikes - 1);
+        }
+        
+        // Toggle like
+        if (confession.isLiked) {
+          newLikedUsers = newLikedUsers.filter(user => user !== currentUserId);
+          newLikes = Math.max(0, newLikes - 1);
+        } else {
+          newLikedUsers.push(currentUserId);
+          newLikes = newLikes + 1;
+        }
+        
+        return {
+          ...confession,
+          isLiked: !confession.isLiked,
+          isDisliked: false,
+          likes: newLikes,
+          dislikes: newDislikes,
+          likedUsers: newLikedUsers,
+          dislikedUsers: newDislikedUsers,
+        };
+      }
+      return confession;
+    }));
   };
 
   const handleDislike = (id: string) => {
-    setConfessions(prev => prev.map(confession => 
-      confession.id === id 
-        ? { 
-            ...confession, 
-            isDisliked: !confession.isDisliked,
-            isLiked: confession.isDisliked ? confession.isLiked : false,
-            dislikes: confession.isDisliked ? confession.dislikes - 1 : confession.dislikes + 1
-          }
-        : confession
-    ));
+    setConfessions(prev => prev.map(confession => {
+      if (confession.id === id) {
+        const currentUserId = 'You';
+        let newLikedUsers = [...confession.likedUsers];
+        let newDislikedUsers = [...confession.dislikedUsers];
+        let newLikes = confession.likes;
+        let newDislikes = confession.dislikes;
+        
+        // Remove from liked if currently liked
+        if (confession.isLiked) {
+          newLikedUsers = newLikedUsers.filter(user => user !== currentUserId);
+          newLikes = Math.max(0, newLikes - 1);
+        }
+        
+        // Toggle dislike
+        if (confession.isDisliked) {
+          newDislikedUsers = newDislikedUsers.filter(user => user !== currentUserId);
+          newDislikes = Math.max(0, newDislikes - 1);
+        } else {
+          newDislikedUsers.push(currentUserId);
+          newDislikes = newDislikes + 1;
+        }
+        
+        return {
+          ...confession,
+          isLiked: false,
+          isDisliked: !confession.isDisliked,
+          likes: newLikes,
+          dislikes: newDislikes,
+          likedUsers: newLikedUsers,
+          dislikedUsers: newDislikedUsers,
+        };
+      }
+      return confession;
+    }));
   };
 
-  const handleReport = (id: string) => {
-    Alert.alert(
-      'Report Post',
-      'Why are you reporting this post?',
-      [
-        { text: 'Spam', onPress: () => Alert.alert('Reported', 'Thank you for reporting. We\'ll review this post.') },
-        { text: 'Inappropriate Content', onPress: () => Alert.alert('Reported', 'Thank you for reporting. We\'ll review this post.') },
-        { text: 'Harassment', onPress: () => Alert.alert('Reported', 'Thank you for reporting. We\'ll review this post.') },
-        { text: 'Cancel', style: 'cancel' }
-      ]
-    );
+  const handleUserAction = (userId: string, action: 'friend' | 'block' | 'mute' | 'report' | 'hide') => {
+    switch (action) {
+      case 'friend':
+        Alert.alert('Friend Request', `Friend request sent to ${userId}! 📤`);
+        break;
+      case 'block':
+        Alert.alert(
+          'Block User',
+          `Are you sure you want to block ${userId}? You won't see their posts anymore.`,
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { 
+              text: 'Block', 
+              style: 'destructive',
+              onPress: () => {
+                setBlockedUsers(prev => [...prev, userId]);
+                Alert.alert('Blocked', `${userId} has been blocked.`);
+              }
+            }
+          ]
+        );
+        break;
+      case 'mute':
+        setMutedUsers(prev => [...prev, userId]);
+        Alert.alert('Muted', `${userId} has been muted.`);
+        break;
+      case 'report':
+        Alert.alert(
+          'Report User',
+          `Why are you reporting ${userId}?`,
+          [
+            { text: 'Spam', onPress: () => Alert.alert('Reported', 'Thank you for reporting. We\'ll review this user.') },
+            { text: 'Inappropriate Content', onPress: () => Alert.alert('Reported', 'Thank you for reporting. We\'ll review this user.') },
+            { text: 'Harassment', onPress: () => Alert.alert('Reported', 'Thank you for reporting. We\'ll review this user.') },
+            { text: 'Cancel', style: 'cancel' }
+          ]
+        );
+        break;
+      case 'hide':
+        setHiddenPosts(prev => [...prev, showUserActions || '']);
+        Alert.alert('Hidden', 'Post has been hidden from your feed.');
+        break;
+    }
+    setShowUserActions(null);
   };
+
   const handlePostConfession = () => {
     if (newPostTitle.trim() && newPostContent.trim()) {
       const newConfession: Confession = {
@@ -197,6 +305,8 @@ export default function GlobalChatScreen() {
         isLiked: false,
         isDisliked: false,
         anonymousId: 'You',
+        likedUsers: [],
+        dislikedUsers: [],
       };
       setConfessions(prev => [newConfession, ...prev]);
       setNewPostTitle('');
@@ -232,6 +342,7 @@ export default function GlobalChatScreen() {
       </Text>
     </TouchableOpacity>
   );
+
   const renderCategoryChip = ({ item }: { item: Category }) => (
     <TouchableOpacity
       style={[
@@ -258,6 +369,7 @@ export default function GlobalChatScreen() {
 
   const renderConfession = ({ item }: { item: Confession }) => {
     const categoryInfo = getCategoryInfo(item.category);
+    const isUserMuted = mutedUsers.includes(item.anonymousId);
     
     return (
       <View style={styles.confessionCard}>
@@ -273,10 +385,18 @@ export default function GlobalChatScreen() {
         </View>
         
         <Text style={styles.confessionTitle}>{item.title}</Text>
-        <Text style={styles.confessionContent}>{item.content}</Text>
+        <Text style={styles.confessionContent}>
+          {isUserMuted ? '[Content hidden - User muted]' : item.content}
+        </Text>
         
         <View style={styles.confessionFooter}>
-          <Text style={styles.anonymousId}>- {item.anonymousId}</Text>
+          <TouchableOpacity 
+            style={styles.anonymousIdContainer}
+            onPress={() => setShowUserActions(item.id)}
+          >
+            <Text style={styles.anonymousId}>- {item.anonymousId}</Text>
+            {isUserMuted && <VolumeX size={12} color="#666" style={{ marginLeft: 4 }} />}
+          </TouchableOpacity>
           
           <View style={styles.actionButtons}>
             <TouchableOpacity 
@@ -318,15 +438,48 @@ export default function GlobalChatScreen() {
             <TouchableOpacity style={styles.actionButton}>
               <Share size={18} color="#666" />
             </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.actionButton}
-              onPress={() => handleReport(item.id)}
-            >
-              <Flag size={18} color="#666" />
-            </TouchableOpacity>
           </View>
         </View>
+
+        {showUserActions === item.id && (
+          <View style={styles.userActionsModal}>
+            <TouchableOpacity 
+              style={styles.userActionItem}
+              onPress={() => handleUserAction(item.anonymousId, 'friend')}
+            >
+              <UserPlus size={16} color="#4CAF50" />
+              <Text style={styles.userActionText}>Add Friend</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.userActionItem}
+              onPress={() => handleUserAction(item.anonymousId, 'mute')}
+            >
+              <VolumeX size={16} color="#FF9800" />
+              <Text style={styles.userActionText}>Mute User</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.userActionItem}
+              onPress={() => handleUserAction(item.anonymousId, 'block')}
+            >
+              <Ban size={16} color="#F44336" />
+              <Text style={styles.userActionText}>Block User</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.userActionItem}
+              onPress={() => handleUserAction(item.anonymousId, 'hide')}
+            >
+              <EyeOff size={16} color="#666" />
+              <Text style={styles.userActionText}>Hide Post</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.userActionItem}
+              onPress={() => handleUserAction(item.anonymousId, 'report')}
+            >
+              <Flag size={16} color="#F44336" />
+              <Text style={styles.userActionText}>Report User</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     );
   };
@@ -368,15 +521,19 @@ export default function GlobalChatScreen() {
         style={styles.sectionsList}
         contentContainerStyle={styles.sectionsContent}
       />
-      <FlatList
-        data={categories}
-        renderItem={renderCategoryChip}
-        keyExtractor={(item) => item.id}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.categoriesList}
-        contentContainerStyle={styles.categoriesContent}
-      />
+
+      <View style={styles.categoriesSection}>
+        <Text style={styles.categoriesTitle}>Categories</Text>
+        <FlatList
+          data={categories}
+          renderItem={renderCategoryChip}
+          keyExtractor={(item) => item.id}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoriesList}
+          contentContainerStyle={styles.categoriesContent}
+        />
+      </View>
 
       <FlatList
         data={filteredConfessions}
@@ -386,6 +543,14 @@ export default function GlobalChatScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.confessionsContent}
       />
+
+      {showUserActions && (
+        <TouchableOpacity 
+          style={styles.modalOverlay}
+          onPress={() => setShowUserActions(null)}
+          activeOpacity={1}
+        />
+      )}
 
       <Modal
         visible={showNewPost}
@@ -538,26 +703,40 @@ const styles = StyleSheet.create({
   selectedSectionText: {
     color: 'white',
   },
+  categoriesSection: {
+    backgroundColor: 'white',
+    marginHorizontal: 16,
+    marginBottom: 8,
+    borderRadius: 12,
+    padding: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  categoriesTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
+  },
   categoriesList: {
     maxHeight: 60,
   },
   categoriesContent: {
-    paddingHorizontal: 16,
     paddingBottom: 8,
   },
   categoryChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: '#f8f9fa',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
     marginRight: 8,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
   },
   categoryIcon: {
     fontSize: 16,
@@ -575,7 +754,7 @@ const styles = StyleSheet.create({
   categoryCount: {
     fontSize: 12,
     color: '#666',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#e9ecef',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 10,
@@ -600,6 +779,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    position: 'relative',
   },
   confessionHeader: {
     flexDirection: 'row',
@@ -653,6 +833,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  anonymousIdContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 12,
+  },
   anonymousId: {
     fontSize: 14,
     fontStyle: 'italic',
@@ -661,11 +847,13 @@ const styles = StyleSheet.create({
   actionButtons: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexShrink: 0,
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
     marginLeft: 12,
+    minWidth: 40,
   },
   actionText: {
     fontSize: 14,
@@ -678,9 +866,45 @@ const styles = StyleSheet.create({
   dislikedText: {
     color: '#FF6B6B',
   },
+  userActionsModal: {
+    position: 'absolute',
+    top: 60,
+    right: 16,
+    backgroundColor: '#2c3e50',
+    borderRadius: 12,
+    padding: 8,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    zIndex: 1000,
+    minWidth: 150,
+  },
+  userActionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+  },
+  userActionText: {
+    fontSize: 14,
+    color: '#ecf0f1',
+    marginLeft: 8,
+    fontWeight: '500',
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'transparent',
+    zIndex: 999,
+  },
   modalContainer: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#2c3e50',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -690,16 +914,16 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: '#34495e',
   },
   modalCancel: {
     fontSize: 16,
-    color: '#666',
+    color: '#ecf0f1',
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#ecf0f1',
   },
   modalPost: {
     fontSize: 16,
@@ -713,7 +937,7 @@ const styles = StyleSheet.create({
   modalLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#ecf0f1',
     marginBottom: 12,
   },
   modalCategories: {
@@ -722,7 +946,7 @@ const styles = StyleSheet.create({
   modalCategoryChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#34495e',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
@@ -735,27 +959,29 @@ const styles = StyleSheet.create({
   modalCategoryText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: '#ecf0f1',
   },
   selectedModalCategoryText: {
     color: 'white',
   },
   modalTitleInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#34495e',
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
-    color: '#333',
+    color: '#ecf0f1',
+    backgroundColor: '#34495e',
     marginBottom: 24,
   },
   modalTextInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#34495e',
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
-    color: '#333',
+    color: '#ecf0f1',
+    backgroundColor: '#34495e',
     height: 200,
     marginBottom: 24,
   },

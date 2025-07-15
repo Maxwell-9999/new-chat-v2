@@ -99,6 +99,7 @@ export default function RoomChatScreen() {
       { text: 'Room Info', onPress: () => Alert.alert('Room Info', `Room: ${roomName}\nMembers: ${memberCount}\nCreated: Dec 2024\nType: ${id === '6' ? 'Private' : 'Public'}`) },
       { text: 'Manage Members', onPress: () => handleManageMembers() },
       { text: 'Invite Members', onPress: () => handleInviteMembers() },
+      { text: 'Mute Settings', onPress: () => Alert.alert('Mute Settings', 'Configure mute options for this room') },
       { text: 'Room Settings', onPress: () => Alert.alert('Settings', 'Room settings opened') },
       { text: 'Leave Room', style: 'destructive', onPress: () => handleLeaveRoom() },
       { text: 'Cancel', style: 'cancel' }
@@ -107,6 +108,7 @@ export default function RoomChatScreen() {
     const memberOptions = [
       { text: 'Room Info', onPress: () => Alert.alert('Room Info', `Room: ${roomName}\nMembers: ${memberCount}\nCreated: Dec 2024`) },
       { text: 'Invite Members', onPress: () => handleInviteMembers() },
+      { text: 'Mute Room', onPress: () => Alert.alert('Muted', 'Room notifications have been muted') },
       { text: 'Leave Room', style: 'destructive', onPress: () => handleLeaveRoom() },
       { text: 'Cancel', style: 'cancel' }
     ];
@@ -133,6 +135,8 @@ export default function RoomChatScreen() {
       'Choose an action:',
       [
         { text: 'Make Admin', onPress: () => Alert.alert('Success', `${memberName} is now an admin`) },
+        { text: 'Mute User', onPress: () => Alert.alert('Muted', `${memberName} has been muted in this room`) },
+        { text: 'Block User', onPress: () => Alert.alert('Blocked', `${memberName} has been blocked`) },
         { text: 'Kick from Room', style: 'destructive', onPress: () => Alert.alert('Kicked', `${memberName} has been removed from the room`) },
         { text: 'Cancel', style: 'cancel' }
       ]
