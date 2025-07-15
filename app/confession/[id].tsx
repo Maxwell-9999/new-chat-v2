@@ -203,7 +203,7 @@ export default function ConfessionDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#2c3e50',
   },
   header: {
     backgroundColor: '#1877F2',
@@ -227,9 +227,10 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    backgroundColor: '#2c3e50',
   },
   confessionCard: {
-    backgroundColor: 'white',
+    backgroundColor: '#34495e',
     margin: 16,
     padding: 20,
     borderRadius: 12,
@@ -242,7 +243,7 @@ const styles = StyleSheet.create({
   categoryBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#2c3e50',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -256,12 +257,12 @@ const styles = StyleSheet.create({
   categoryText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#666',
+    color: '#bdc3c7',
   },
   confessionContent: {
     fontSize: 18,
     lineHeight: 26,
-    color: '#333',
+    color: '#ecf0f1',
     marginBottom: 20,
   },
   confessionFooter: {
@@ -276,7 +277,7 @@ const styles = StyleSheet.create({
   confessionAuthor: {
     fontSize: 14,
     fontStyle: 'italic',
-    color: '#666',
+    color: '#bdc3c7',
   },
   confessionTimestamp: {
     fontSize: 12,
@@ -293,7 +294,7 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontSize: 16,
-    color: '#666',
+    color: '#bdc3c7',
     marginLeft: 6,
     fontWeight: '600',
   },
@@ -301,7 +302,7 @@ const styles = StyleSheet.create({
     color: '#FF6B6B',
   },
   commentsSection: {
-    backgroundColor: 'white',
+    backgroundColor: '#34495e',
     margin: 16,
     marginTop: 0,
     borderRadius: 12,
@@ -315,7 +316,7 @@ const styles = StyleSheet.create({
   commentsTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#ecf0f1',
     marginBottom: 16,
   },
   commentContainer: {
@@ -341,7 +342,7 @@ const styles = StyleSheet.create({
   commentText: {
     fontSize: 15,
     lineHeight: 22,
-    color: '#333',
+    color: '#ecf0f1',
     marginBottom: 8,
   },
   commentActions: {
@@ -358,7 +359,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   commentInputContainer: {
-    backgroundColor: 'white',
+    backgroundColor: '#34495e',
     flexDirection: 'row',
     alignItems: 'flex-end',
     paddingHorizontal: 16,
@@ -369,13 +370,14 @@ const styles = StyleSheet.create({
   commentInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#2c3e50',
+    backgroundColor: '#2c3e50',
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 8,
     maxHeight: 100,
     fontSize: 16,
-    color: '#333',
+    color: '#ecf0f1',
     marginRight: 8,
   },
   sendCommentButton: {

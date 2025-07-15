@@ -57,14 +57,24 @@ export default function NewChatScreen() {
   };
 
   const createGroup = () => {
-    Alert.alert(
+    Alert.prompt(
       'Create Group',
       'Enter group name:',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Create', onPress: () => router.back() }
+        { 
+          text: 'Create', 
+          onPress: (text) => {
+            if (text && text.trim()) {
+              Alert.alert('Success', `Group "${text}" created! 🎉`);
+              router.back();
+            } else {
+              Alert.alert('Error', 'Please enter a valid group name');
+            }
+          }
+        }
       ],
-      { type: 'plain-text' }
+      'plain-text'
     );
   };
 
