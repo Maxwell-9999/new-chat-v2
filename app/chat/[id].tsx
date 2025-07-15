@@ -10,7 +10,6 @@ import {
   Alert,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft, Send, Paperclip, Mic, Phone, Video, MoveVertical as MoreVertical, UserX, Star, Info } from 'lucide-react-native';
 import { ArrowLeft, Send, Paperclip, Mic, MoveVertical as MoreVertical, UserX, Star, Info, VolumeX, Ban } from 'lucide-react-native';
 
 interface Message {
