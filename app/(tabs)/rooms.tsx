@@ -151,8 +151,7 @@ export default function RoomsScreen() {
     const matchesSearch = room.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          room.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || room.category === selectedCategory;
-    const matchesTab = selectedTab === 'global' ? !room.isPrivate || room.roomType === 'public' : 
-                      selectedTab === 'private' ? room.isPrivate && room.isJoined;
+    const matchesTab = selectedTab === 'global' ? (!room.isPrivate || room.roomType === 'public') : (room.isPrivate && room.isJoined);
     return matchesSearch && matchesCategory && matchesTab;
   }).sort((a, b) => {
     // Sort favorites first
